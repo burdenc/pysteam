@@ -9,23 +9,27 @@ import winutils
 
 from model import LocalUserContext, Steam
 
+def _resolve_userdata_path(paths):
+  """
+  Helper function which checks if the potential userdata directory exists
+  and returns a new Steam instance with that userdata directory if it does.
+  If the directory doesnt exist it returns None instead
+  """
+  if not paths: return None
+  return next((Steam(path) for path in paths if os.path.exists(path)), None)
+
 def get_steam():
   """
   Returns a Steam object representing the current Steam installation on the
   users computer. If the user doesn't have Steam installed, returns None.
   """
-  # Helper function which checks if the potential userdata directory exists
-  # and returns a new Steam instance with that userdata directory if it does.
-  # If the directory doesnt exist it returns None instead
-  helper = lambda udd: Steam(udd) if os.path.exists(udd) else None
-
-  # For both OS X and Linux, Steam stores it's userdata in a consistent
-  # location.
+  # For both OS X and Linux, Steam stores it's userdata in a few consistent
+  # locations.
   plat = platform.system()
   if plat == 'Darwin':
-    return helper(paths.default_osx_userdata_path())
+    return _resolve_userdata_path(paths.default_osx_userdata_paths())
   if plat == 'Linux':
-    return helper(paths.default_linux_userdata_path())
+    return _resolve_userdata_path(paths.default_linux_userdata_paths())
 
   # Windows is a bit trickier. The userdata directory is stored in the Steam
   # installation directory, meaning that theoretically it could be anywhere.
@@ -33,9 +37,7 @@ def get_steam():
   # still possible for us to figure out automatically
   if plat == 'Windows':
     possible_dir = winutils.find_userdata_directory()
-    # Unlike the others, `possible_dir` might be None (if something odd
-    # happened with the registry)
-    return helper(possible_dir) if possible_dir is not None else None
+    return _resolve_userdata_path([possible_dir])
   # This should never be hit. Windows, OS X, and Linux should be the only
   # supported platforms.
   # TODO: Add logging here so that the user (developer) knows that something

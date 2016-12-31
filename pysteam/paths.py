@@ -19,23 +19,33 @@ import os
 # See also the `get_steam()` function, which will return a valid Steam
 # instance for the current platform.
 
-def default_osx_userdata_path():
-  return os.path.join(
-    os.path.expanduser("~"),
-    "Library",
-    "Application Support",
-    "Steam",
-    "userdata"
-  )
+def default_osx_userdata_paths():
+  return [
+    os.path.join(
+       os.path.expanduser("~"),
+      "Library",
+      "Application Support",
+      "Steam",
+      "userdata"
+    )
+  ]
 
-def default_linux_userdata_path():
-  return os.path.join(
-    os.path.expanduser("~"),
-    ".local",
-    "share",
-    "Steam",
-    "userdata"
-  )
+def default_linux_userdata_paths():
+  return [
+    os.path.join(
+      os.path.expanduser("~"),
+      ".local",
+      "share",
+      "Steam",
+      "userdata"
+    ),
+    os.path.join(
+      os.path.expanduser("~"),
+      ".steam",
+      "steam",
+      "userdata"
+    )
+  ]
 
 # =============================================================================
 # User-specific paths
